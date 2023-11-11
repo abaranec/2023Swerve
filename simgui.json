@@ -1,0 +1,32 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "SPARK MAX [1]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Swerve/FrontLeft/Angle": "Gyro",
+      "/Shuffleboard/Swerve/FrontLeft/Drive": "Motor Controller",
+      "/Shuffleboard/Swerve/FrontLeft/PosPID": "PIDController",
+      "/Shuffleboard/Swerve/FrontLeft/Steering": "Motor Controller",
+      "/Shuffleboard/Swerve/FrontRight/Angle": "Gyro",
+      "/Shuffleboard/Swerve/FrontRight/Drive": "Motor Controller",
+      "/Shuffleboard/Swerve/FrontRight/PosPID": "PIDController",
+      "/Shuffleboard/Swerve/FrontRight/Steering": "Motor Controller",
+      "/Shuffleboard/Swerve/RearLeft/Angle": "Gyro",
+      "/Shuffleboard/Swerve/RearLeft/Drive": "Motor Controller",
+      "/Shuffleboard/Swerve/RearLeft/PosPID": "PIDController",
+      "/Shuffleboard/Swerve/RearLeft/Steering": "Motor Controller",
+      "/Shuffleboard/Swerve/RearRight/Angle": "Gyro",
+      "/Shuffleboard/Swerve/RearRight/Drive": "Motor Controller",
+      "/Shuffleboard/Swerve/RearRight/PosPID": "PIDController",
+      "/Shuffleboard/Swerve/RearRight/Steering": "Motor Controller"
+    }
+  }
+}
