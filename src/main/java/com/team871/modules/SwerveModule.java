@@ -35,7 +35,6 @@ public class SwerveModule {
     private final Translation2d leverArm;
     private final PIDController positionController;
 
-    private SwerveModuleState currentState;
     private GenericEntry directrionEntry;
     private GenericEntry speedEntry;
     private GenericEntry updateTime;
@@ -95,7 +94,6 @@ public class SwerveModule {
     }
 
     public void setState(final SwerveModuleState newState) {
-        this.currentState = newState;
         if(RobotState.isTest()) {
             if(this.captureButton.getBoolean(false)) {
                 final double readPosition = sensor.getAbsolutePosition();

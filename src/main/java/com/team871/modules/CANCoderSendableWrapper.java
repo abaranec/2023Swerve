@@ -15,7 +15,7 @@ public class CANCoderSendableWrapper implements Sendable {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.addDoubleProperty("AbsPosition", () -> cc.getAbsolutePosition(), null);
-        builder.addDoubleProperty("Position", () -> cc.getPosition(), null);
+        builder.addDoubleProperty("Position", () -> cc.getPosition(), p -> cc.setPosition(p));
         builder.addDoubleProperty("Velocity", () -> cc.getVelocity(), null);
     }
     

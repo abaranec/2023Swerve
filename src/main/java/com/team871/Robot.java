@@ -8,8 +8,8 @@ import com.team871.modules.SwerveDrive;
 import com.team871.modules.SwerveModule;
 import com.team871.modules.SwerveModule.ModulePosition;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 public class Robot extends TimedRobot {
 
   SwerveDrive drive;
-  Joystick joy;
+  XboxController joy;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -50,12 +50,12 @@ public class Robot extends TimedRobot {
          // .withPosition(5 , 4)
           .withSize(5,4)));
 
-    joy = new Joystick(0);
+    joy = new XboxController(0);
   }
 
   @Override
   public void robotPeriodic() {
-    drive.drive(-joy.getRawAxis(1), joy.getRawAxis(0), joy.getRawAxis(2));
+    drive.drive(-joy.getLeftY(), joy.getLeftX(), joy.getRightX());
   }
 
   @Override
