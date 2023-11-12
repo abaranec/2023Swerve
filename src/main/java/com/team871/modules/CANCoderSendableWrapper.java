@@ -7,7 +7,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class CANCoderSendableWrapper implements Sendable {
     private final CANCoder cc;
-    
+
     public CANCoderSendableWrapper(CANCoder cc) {
         this.cc = cc;
     }
@@ -18,5 +18,5 @@ public class CANCoderSendableWrapper implements Sendable {
         builder.addDoubleProperty("Position", () -> cc.getPosition(), p -> cc.setPosition(p));
         builder.addDoubleProperty("Velocity", () -> cc.getVelocity(), null);
     }
-    
+
 }

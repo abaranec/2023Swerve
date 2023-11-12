@@ -16,12 +16,13 @@ public class SparkMaxSendableWrapper implements Sendable {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Motor Controller");
-		builder.setActuator(true);
-		builder.setSafeState(mc::stopMotor);
-		builder.addDoubleProperty("Output", mc::get, mc::set);
+        builder.setActuator(true);
+        builder.setSafeState(mc::stopMotor);
+        builder.addDoubleProperty("Output", mc::get, mc::set);
         builder.addDoubleProperty("Position", () -> mc.getEncoder().getPosition(), p -> mc.getEncoder().setPosition(p));
         builder.addDoubleProperty("Velocity", () -> mc.getEncoder().getVelocity(), null);
-        builder.addBooleanProperty("BreakMode", () -> mc.getIdleMode() == IdleMode.kBrake, (brake) -> mc.setIdleMode(brake ? IdleMode.kBrake : IdleMode.kCoast));
+        builder.addBooleanProperty("BreakMode", () -> mc.getIdleMode() == IdleMode.kBrake,
+                (brake) -> mc.setIdleMode(brake ? IdleMode.kBrake : IdleMode.kCoast));
         builder.addDoubleProperty("Temp", () -> mc.getMotorTemperature(), null);
     }
 }

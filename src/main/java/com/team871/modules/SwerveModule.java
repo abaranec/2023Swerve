@@ -41,15 +41,15 @@ public class SwerveModule {
     private GenericEntry captureButton;
 
     public SwerveModule(final ModulePosition modPos,
-        final int driveId, 
-        final int steeringId, 
-        final int sensorId,
-        final ShuffleboardLayout targetLayout) {
+            final int driveId,
+            final int steeringId,
+            final int sensorId,
+            final ShuffleboardLayout targetLayout) {
 
         this.driveMotor = new CANSparkMax(driveId, MotorType.kBrushless);
         RelativeEncoder encoder = driveMotor.getEncoder();
         final double positionFactor = Constants.WHEEL_LENGTH_METERS * Constants.DRIVE_GEAR_RATIO;
-        
+
         encoder.setPositionConversionFactor(positionFactor);
         encoder.setVelocityConversionFactor(positionFactor / 60.0);
         driveMotor.enableVoltageCompensation(12);
@@ -72,38 +72,38 @@ public class SwerveModule {
         this.leverArm = Constants.getLeverArm(modPos);
 
         // TODO: These are BS PID numbers.
-        this.positionController = new PIDController(1/180.0d, 0, 1/360.0d);
+        this.positionController = new PIDController(1 / 180.0d, 0, 1 / 360.0d);
 
         targetLayout.add("Steering", new SparkMaxSendableWrapper(steeringMotor))
-              .withWidget(BuiltInWidgets.kMotorController);
+                .withWidget(BuiltInWidgets.kMotorController);
         targetLayout.add("Drive", new SparkMaxSendableWrapper(driveMotor))
-              .withWidget(BuiltInWidgets.kMotorController);
+                .withWidget(BuiltInWidgets.kMotorController);
         targetLayout.add("PosPID", positionController);
         targetLayout.add("Angle", new CANCoderSendableWrapper(sensor));
         this.directrionEntry = targetLayout.add("tDirection", 0)
-          .withWidget(BuiltInWidgets.kGyro)
-          .withProperties(Map.of("Min", "0", "Max", "360"))
-          .getEntry();
+                .withWidget(BuiltInWidgets.kGyro)
+                .withProperties(Map.of("Min", "0", "Max", "360"))
+                .getEntry();
         this.speedEntry = targetLayout.add("tSpeedMPS", 0).getEntry();
         this.updateTime = targetLayout.add("tUpdate", 0).getEntry();
         this.captureButton = targetLayout.add("CaptureOffset", false)
-            .withWidget(BuiltInWidgets.kToggleButton).getEntry();
+                .withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
         // Initialize our current state to stopped and position 0
         setState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     }
 
     public void setState(final SwerveModuleState newState) {
-        if(RobotState.isTest()) {
-            if(this.captureButton.getBoolean(false)) {
+        if (RobotState.isTest()) {
+            if (this.captureButton.getBoolean(false)) {
                 final double readPosition = sensor.getAbsolutePosition();
                 final double currentOffset = sensor.configGetMagnetOffset();
-                sensor.configMagnetOffset(readPosition-currentOffset);
+                sensor.configMagnetOffset(readPosition - currentOffset);
                 captureButton.setBoolean(false);
-                System.out.println("I set it to " + (readPosition-currentOffset));
+                System.out.println("I set it to " + (readPosition - currentOffset));
             }
         }
-        
+
         final long tStart = RobotController.getFPGATime();
         final double degrees = newState.angle.getDegrees();
 
@@ -115,7 +115,7 @@ public class SwerveModule {
         // Finally, update telemetry
         directrionEntry.setDouble(degrees);
         speedEntry.setDouble(newState.speedMetersPerSecond);
-        updateTime.setDouble((RobotController.getFPGATime() - tStart)/1000.0d);
+        updateTime.setDouble((RobotController.getFPGATime() - tStart) / 1000.0d);
     }
 
     public Translation2d getLeverArm() {

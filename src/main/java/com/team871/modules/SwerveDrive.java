@@ -18,19 +18,20 @@ public class SwerveDrive {
     public SwerveDrive(final ShuffleboardTab telemetryTab, final SwerveModule... modules) {
         this.modules = modules;
         this.kinematics = new SwerveDriveKinematics(
-            Arrays.stream(modules)
-                  .map(SwerveModule::getLeverArm)
-                  .toArray(Translation2d[]::new));
+                Arrays.stream(modules)
+                        .map(SwerveModule::getLeverArm)
+                        .toArray(Translation2d[]::new));
 
         this.tProcEntry = telemetryTab.add("tOverall", 0).getEntry();
     }
 
     public void drive(final double vxMps, final double vyMps, final double rotOmegaPs) {
         final long tStart = RobotController.getFPGATime();
-        final SwerveModuleState[] newStates = kinematics.toSwerveModuleStates(new ChassisSpeeds(vxMps, vyMps, rotOmegaPs));
-        for(int moduleNo = 0; moduleNo < modules.length; moduleNo++) {
+        final SwerveModuleState[] newStates = kinematics
+                .toSwerveModuleStates(new ChassisSpeeds(vxMps, vyMps, rotOmegaPs));
+        for (int moduleNo = 0; moduleNo < modules.length; moduleNo++) {
             modules[moduleNo].setState(newStates[moduleNo]);
         }
-        tProcEntry.setDouble((RobotController.getFPGATime() - tStart)/1000.0d);
+        tProcEntry.setDouble((RobotController.getFPGATime() - tStart) / 1000.0d);
     }
 }
