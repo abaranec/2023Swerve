@@ -6,8 +6,11 @@ package com.team871;
 
 import com.team871.modules.SwerveDrive;
 import com.team871.modules.SwerveModule;
-import com.team871.modules.SwerveModule.ModulePosition;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -26,7 +29,10 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 public class Robot extends TimedRobot {
 
   SwerveDrive drive;
+  SwerveModule[] mods;
   XboxController joy;
+
+  GenericEntry ge;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -36,69 +42,87 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     ShuffleboardTab tab = Shuffleboard.getTab("Swerve");
-    this.drive = new SwerveDrive(tab,
-        new SwerveModule(ModulePosition.RearLeft, 1, 3, 2,
-            tab.getLayout("RearLeft", BuiltInLayouts.kGrid)
-                // .withPosition(0 , 4)
-                .withSize(5, 4)),
-        new SwerveModule(ModulePosition.FrontLeft, 4, 6, 5,
+    ge = tab.add("Desired", 0.0).getEntry();
+    mods = new SwerveModule[] {
+        new SwerveModule(
+            Constants.FL_DRIVE_CAN_ID,
+            Constants.FL_DRIVE_INVERTED,
+            Constants.FL_STEER_CAN_ID,
+            Constants.FL_STEER_INVERTED,
+            Constants.FL_SENSOR_CAN_ID,
+            Constants.FL_ANGLE_OFFSET,
+            Constants.FL_SENSOR_INVERTED,
+            Constants.FL_LEVER_ARM,
             tab.getLayout("FrontLeft", BuiltInLayouts.kGrid)
-                // .withPosition(0 , 0)
                 .withSize(5, 4)),
-        new SwerveModule(ModulePosition.FrontRight, 7, 9, 8,
+        new SwerveModule(
+            Constants.FR_DRIVE_CAN_ID,
+            Constants.FR_DRIVE_INVERTED,
+            Constants.FR_STEER_CAN_ID,
+            Constants.FR_STEER_INVERTED,
+            Constants.FR_SENSOR_CAN_ID,
+            Constants.FR_ANGLE_OFFSET,
+            Constants.FR_SENSOR_INVERTED,
+            Constants.FR_LEVER_ARM,
             tab.getLayout("FrontRight", BuiltInLayouts.kGrid)
-                // .withPosition(5 , 0)
                 .withSize(5, 4)),
-        new SwerveModule(ModulePosition.RearRight, 10, 12, 11,
+        new SwerveModule(
+            Constants.BL_DRIVE_CAN_ID,
+            Constants.BL_DRIVE_INVERTED,
+            Constants.BL_STEER_CAN_ID,
+            Constants.BL_STEER_INVERTED,
+            Constants.BL_SENSOR_CAN_ID,
+            Constants.BL_ANGLE_OFFSET,
+            Constants.BL_SENSOR_INVERTED,
+            Constants.BL_LEVER_ARM,
+            tab.getLayout("RearLeft", BuiltInLayouts.kGrid)
+                .withSize(5, 4)),
+        new SwerveModule(
+            Constants.RR_DRIVE_CAN_ID,
+            Constants.RR_DRIVE_INVERTED,
+            Constants.RR_STEER_CAN_ID,
+            Constants.RR_STEER_INVERTED,
+            Constants.RR_SENSOR_CAN_ID,
+            Constants.RR_ANGLE_OFFSET,
+            Constants.RR_SENSOR_INVERTED,
+            Constants.RR_LEVER_ARM,
             tab.getLayout("RearRight", BuiltInLayouts.kGrid)
-                // .withPosition(5 , 4)
-                .withSize(5, 4)));
+                .withSize(5, 4))
+    };
+
+    this.drive = new SwerveDrive(tab, mods);
 
     joy = new XboxController(0);
   }
 
-  @Override
-  public void robotPeriodic() {
-    drive.drive(-joy.getLeftY(), joy.getLeftX(), joy.getRightX());
-  }
-
-  @Override
-  public void autonomousInit() {
-  }
-
-  @Override
-  public void autonomousPeriodic() {
-  }
-
-  @Override
-  public void teleopInit() {
+  private double applyDeadband(double val) {
+    return Math.abs(val) < .05 ? 0 : val;
   }
 
   @Override
   public void teleopPeriodic() {
-  }
-
-  @Override
-  public void disabledInit() {
-  }
-
-  @Override
-  public void disabledPeriodic() {
-  }
-
-  @Override
-  public void testInit() {
+    drive.drive(
+      applyDeadband(-joy.getLeftY()), 
+      applyDeadband(-joy.getLeftX()),
+      applyDeadband(joy.getRawAxis(2)));
   }
 
   @Override
   public void testPeriodic() {
-  }
+    double target = Math.atan2(
+        applyDeadband(-joy.getLeftX()),
+        applyDeadband(joy.getLeftY()));
+    SwerveModuleState newState = new SwerveModuleState(
+        new Translation2d(
+            applyDeadband(joy.getLeftX()),
+            applyDeadband(joy.getLeftY())).getNorm(),
+        Rotation2d.fromRadians(target));
+    
+    mods[0].setState(newState);
+    mods[1].setState(newState);
+    mods[2].setState(newState);
+    mods[3].setState(newState);
 
-  @Override
-  public void simulationInit() {
-  }
-
-  @Override
-  public void simulationPeriodic() {
+    ge.setDouble(Math.toDegrees(target));
   }
 }

@@ -15,7 +15,7 @@ public class SparkMaxSendableWrapper implements Sendable {
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Motor Controller");
+        // builder.setSmartDashboardType("Motor Controller");
         builder.setActuator(true);
         builder.setSafeState(mc::stopMotor);
         builder.addDoubleProperty("Output", mc::get, mc::set);
