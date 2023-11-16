@@ -6,8 +6,10 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.team871.Constants;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -35,6 +37,7 @@ public class SwerveModule {
     private GenericEntry driveEnabled;
     private GenericEntry steerEnabled;
     private GenericEntry preOpt;
+    private SparkMaxPIDController drivePID;
 
     public SwerveModule(
             final int driveId,
@@ -46,14 +49,24 @@ public class SwerveModule {
             final boolean sensorInverted,
             final Translation2d leverArm,
             final ShuffleboardLayout targetLayout) {
-
+                
+        final double positionFactor = Constants.WHEEL_LENGTH_METERS * Constants.DRIVE_GEAR_RATIO;
         this.driveMotor = new CANSparkMax(driveId, MotorType.kBrushless);
         RelativeEncoder encoder = driveMotor.getEncoder();
-        final double positionFactor = Constants.WHEEL_LENGTH_METERS * Constants.DRIVE_GEAR_RATIO;
 
-        encoder.setPositionConversionFactor(positionFactor);
-        encoder.setVelocityConversionFactor(positionFactor / 60.0);
+        //encoder.setPositionConversionFactor(positionFactor);
+        //encoder.setVelocityConversionFactor(positionFactor / 60.0);
+        encoder.setVelocityConversionFactor(1);
         driveMotor.enableVoltageCompensation(12);
+        drivePID = driveMotor.getPIDController();
+        drivePID.setOutputRange(-1, 1);
+        drivePID.setP(6e-5);
+        drivePID.setI(0);
+        drivePID.setD(0);
+        drivePID.setFF(9e-5);
+        drivePID.setIZone(0);
+        drivePID.setFeedbackDevice(encoder);
+        driveMotor.setClosedLoopRampRate(.1);
         driveMotor.burnFlash();
 
         steeringMotor = new CANSparkMax(steeringId, MotorType.kBrushless);
@@ -170,7 +183,8 @@ public class SwerveModule {
         final double positionVoltage = positionController.calculate(currentDirection, degrees);
         steeringMotor.setVoltage(steerEnabled.getBoolean(true) ? positionVoltage : 0);
 
-        driveMotor.set(driveEnabled.getBoolean(true) ? optimized.speedMetersPerSecond : 0);
+        //driveMotor.set(driveEnabled.getBoolean(true) ? optimized.speedMetersPerSecond : 0);
+        drivePID.setReference(5700.0d*optimized.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
 
         // Finally, update telemetry
         preOpt.setDouble(newState.angle.getDegrees());
