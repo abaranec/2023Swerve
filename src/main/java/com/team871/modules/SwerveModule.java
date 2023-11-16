@@ -10,10 +10,11 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.team871.Constants;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.RobotState;
@@ -25,7 +26,7 @@ public class SwerveModule {
     private final CANSparkMax steeringMotor;
     private final CANCoder sensor;
     private final Translation2d leverArm;
-    private final PIDController positionController;
+    private final ProfiledPIDController positionController;
 
     private GenericEntry directrionEntry;
     private GenericEntry speedEntry;
@@ -73,7 +74,8 @@ public class SwerveModule {
         this.leverArm = leverArm;
 
         // TODO: These are BS PID numbers.
-        this.positionController = new PIDController(.13, 0, 0);
+        this.positionController = new ProfiledPIDController(.13, 0, 0, 
+            new TrapezoidProfile.Constraints(720.0, 3600.0));
         this.positionController.enableContinuousInput(0, 360);
         this.positionController.setTolerance(.5);
 
@@ -124,6 +126,9 @@ public class SwerveModule {
                 .withPosition(2, 2)
                 .getEntry();
 
+        targetLayout.addDouble("DriveVel", () -> driveMotor.getEncoder().getVelocity())
+                .withPosition(3, 1);
+
         // Initialize our current state to stopped and position 0
         setState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     }
@@ -159,7 +164,7 @@ public class SwerveModule {
         double optimizedAngle = optimized.angle.getDegrees();
         double degrees = Math.abs(optimized.speedMetersPerSecond) > 0
                 ? optimizedAngle
-                : positionController.getSetpoint();
+                : positionController.getGoal().position;
 
         // Update controllers
         final double positionVoltage = positionController.calculate(currentDirection, degrees);
