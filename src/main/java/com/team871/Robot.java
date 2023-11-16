@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
             Constants.FL_SENSOR_INVERTED,
             Constants.FL_LEVER_ARM,
             tab.getLayout("FrontLeft", BuiltInLayouts.kGrid)
-                .withSize(5, 4)),
+                .withSize(6, 4)),
         new SwerveModule(
             Constants.FR_DRIVE_CAN_ID,
             Constants.FR_DRIVE_INVERTED,
@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
             Constants.FR_SENSOR_INVERTED,
             Constants.FR_LEVER_ARM,
             tab.getLayout("FrontRight", BuiltInLayouts.kGrid)
-                .withSize(5, 4)),
+                .withSize(6, 4)),
         new SwerveModule(
             Constants.BL_DRIVE_CAN_ID,
             Constants.BL_DRIVE_INVERTED,
@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
             Constants.BL_SENSOR_INVERTED,
             Constants.BL_LEVER_ARM,
             tab.getLayout("RearLeft", BuiltInLayouts.kGrid)
-                .withSize(5, 4)),
+                .withSize(6, 4)),
         new SwerveModule(
             Constants.RR_DRIVE_CAN_ID,
             Constants.RR_DRIVE_INVERTED,
@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
             Constants.RR_SENSOR_INVERTED,
             Constants.RR_LEVER_ARM,
             tab.getLayout("RearRight", BuiltInLayouts.kGrid)
-                .withSize(5, 4))
+                .withSize(6, 4))
     };
 
     this.drive = new SwerveDrive(tab, mods);
@@ -102,9 +102,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     drive.drive(
-      applyDeadband(-joy.getLeftY()), 
-      applyDeadband(-joy.getLeftX()),
-      applyDeadband(joy.getRawAxis(2)));
+      applyDeadband(-joy.getLeftY()*.35), 
+      applyDeadband(-joy.getLeftX()*.35),
+      applyDeadband(-joy.getRawAxis(2)*.35));
   }
 
   @Override
